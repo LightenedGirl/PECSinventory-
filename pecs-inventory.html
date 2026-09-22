@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PECS Inventory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF9F4;
+    --surface: #FFFFFF;
+    --surface-2: #F2F0E7;
+    --ink: #23241F;
+    --ink-soft: #6E6D62;
+    --border: #E4E1D4;
+    --accent: #2F6F6B;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #E4F0EE;
+    --danger: #B94E3B;
+    --danger-soft: #F7E5E0;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 2px rgba(35,36,31,0.06), 0 6px 20px rgba(35,36,31,0.05);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17181B;
+      --surface: #1F2124;
+      --surface-2: #26282C;
+      --ink: #F1F0E9;
+      --ink-soft: #A2A297;
+      --border: #34363B;
+      --accent: #57C2B3;
+      --accent-ink: #10201E;
+      --accent-soft: #1E3532;
+      --danger: #E68874;
+      --danger-soft: #3A2420;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17181B;
+    --surface: #1F2124;
+    --surface-2: #26282C;
+    --ink: #F1F0E9;
+    --ink-soft: #A2A297;
+    --border: #34363B;
+    --accent: #57C2B3;
+    --accent-ink: #10201E;
+    --accent-soft: #1E3532;
+    --danger: #E68874;
+    --danger-soft: #3A2420;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .display {
+    font-family: 'Space Grotesk', 'Inter', ui-sans-serif, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 20px 80px;
+  }
+  header.top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .title-block h1 {
+    margin: 0;
+    font-size: clamp(26px, 4vw, 34px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .title-block .count-line {
+    margin: 4px 0 0;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+  }
+  .count-line strong { color: var(--ink); }
+  .theme-toggle {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--ink);
+    flex: none;
+  }
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .btn {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    padding: 10px 16px;
+    border-radius: 100px;
+    font-size: 14.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: transform 0.12s ease, border-color 0.15s ease;
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn:active { transform: scale(0.97); }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+  .btn.ghost {
+    background: transparent;
+  }
+  .btn.small {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  .btn.danger-text { color: var(--danger); }
+  .view-switch {
+    display: inline-flex;
+    background: var(--surface-2);
+    border-radius: 100px;
+    padding: 3px;
+    gap: 2px;
+    margin-left: auto;
+  }
+  .view-switch button {
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    padding: 8px 15px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .view-switch button.active {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+  }
+  .search-row {
+    position: relative;
+    margin-bottom: 22px;
+  }
+  .search-row input {
+    width: 100%;
+    padding: 12px 16px 12px 40px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+  }
+  .search-row input:focus { border-color: var(--accent); }
+  .search-row .icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-soft);
+    pointer-events: none;
+  }
+  .search-row .clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 13px;
+    display: none;
+  }
+  section.block { margin-bottom: 30px; }
+  .block-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .block-head h2 {
+    font-size: 15px;
+    text-transform: none;
+    color: var(--ink-soft);
+    margin: 0;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+  }
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .cat-card {
+    position: relative;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 12px 12px 11px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s ease, transform 0.12s ease;
+    overflow: hidden;
+  }
+  .cat-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--cat-color, var(--accent));
+  }
+  .cat-card:hover { transform: translateY(-1px); }
+  .cat-card.active { border-color: var(--cat-color, var(--accent)); box-shadow: 0 0 0 2px var(--cat-color, var(--accent)) inset; }
+  .cat-card .name {
+    font-weight: 600;
+    font-size: 14.5px;
+    padding-right: 40px;
+    display: block;
+    margin-top: 4px;
+  }
+  .cat-card .meta {
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    margin-top: 4px;
+    display: block;
+  }
+  .cat-card .cat-actions {
+    position: absolute;
+    top: 10px;
+    right: 8px;
+    display: flex;
+    gap: 2px;
+  }
+  .icon-btn {
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+  .word-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 10px;
+  }
+  .word-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    position: relative;
+  }
+  .word-card .word-text {
+    font-weight: 600;
+    font-size: 15px;
+    padding-right: 44px;
+    display: block;
+    word-break: break-word;
+  }
+  .word-card .word-actions {
+    position: absolute;
+    top: 8px;
+    right: 6px;
+    display: flex;
+    gap: 2px;
+  }
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 9px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 9px 3px 6px;
+    border-radius: 100px;
+    background: var(--surface-2);
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+  .dot {
+    width: 9px; height: 9px; border-radius: 50%; flex: none;
+    background: var(--dot-color, var(--accent));
+    border: 1px solid rgba(0,0,0,0.12);
+  }
+  .empty-state {
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: 34px 20px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+  }
+  .empty-state strong { display: block; color: var(--ink); font-size: 16px; margin-bottom: 4px; font-family: 'Space Grotesk', sans-serif;}
+  .listing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 12px;
+  }
+  .listing-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    position: relative;
+  }
+  .listing-card .name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    padding-right: 44px;
+    display: block;
+  }
+  .listing-card .word-list {
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .listing-card .word-actions { position: absolute; top: 10px; right: 8px; display:flex; gap:2px; }
+  .color-strip { display: flex; gap: 4px; margin-top: 10px; }
+  .color-swatch { width: 16px; height: 16px; border-radius: 5px; border: 1px solid rgba(0,0,0,0.15); }
+
+  /* Modal */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(20,20,18,0.42);
+    display: flex; align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+    padding: 0;
+  }
+  @media (min-width: 620px) {
+    .overlay { align-items: center; padding: 20px; }
+  }
+  .modal {
+    background: var(--surface);
+    width: 100%;
+    max-width: 480px;
+    max-height: 88vh;
+    overflow-y: auto;
+    border-radius: 20px 20px 0 0;
+    padding: 22px 20px calc(22px + env(safe-area-inset-bottom, 0px));
+    box-shadow: var(--shadow);
+  }
+  @media (min-width: 620px) {
+    .modal { border-radius: var(--radius-lg); }
+  }
+  .modal h3 { margin: 0 0 16px; font-size: 19px; }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .field input[type="text"], .field input[type="search"] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+  }
+  .field input:focus { border-color: var(--accent); }
+  .color-row { display: flex; gap: 10px; align-items: center; }
+  .color-row input[type="color"] {
+    width: 44px; height: 40px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: none; padding: 2px; cursor: pointer;
+  }
+  .preset-swatches { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .preset-swatch {
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    border-radius: 100px;
+    padding: 5px 10px 5px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .preset-swatch .dot { width: 12px; height: 12px; }
+  .check-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .check-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 7px 12px 7px 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg);
+    user-select: none;
+  }
+  .check-pill input { accent-color: var(--accent); }
+  .check-pill.checked { border-color: var(--accent); background: var(--accent-soft); }
+  .tag-entry { display: flex; gap: 8px; }
+  .tag-entry input { flex: 1; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .tag-list .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 100px; padding: 5px 6px 5px 11px; font-size: 13px; font-weight: 600;
+  }
+  .tag-list .tag button {
+    border: none; background: none; color: var(--ink-soft); width: 18px; height: 18px; border-radius: 50%; font-size: 11px;
+  }
+  .tag-list .tag button:hover { background: var(--danger-soft); color: var(--danger); }
+  .modal-actions {
+    display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;
+  }
+  .hint { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+  .close-x {
+    position: absolute; top: 14px; right: 14px;
+  }
+  .modal { position: relative; }
+  .empty-cats-note {
+    font-size: 13px; color: var(--ink-soft); padding: 10px 0;
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+  a, button, input, [tabindex] { outline-offset: 2px; }
+  a:focus-visible, button:focus-visible, input:focus-visible, .cat-card:focus-visible {
+    outline: 2px solid var(--accent);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="title-block">
+      <h1><span aria-hidden="true">🗣️</span> PECS Inventory</h1>
+      <p class="count-line" id="countLine">Loading…</p>
+      <p class="count-line" id="syncLine" style="display:none;"></p>
+    </div>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle light or dark theme">🌓</button>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn primary" id="addWordBtn">＋ Add word</button>
+    <button class="btn" id="addCategoryBtn">＋ Add category</button>
+    <button class="btn" id="backupBtn">⇅ Backup</button>
+    <div class="view-switch" role="tablist">
+      <button id="tabInventory" class="active" role="tab">Inventory</button>
+      <button id="tabListings" role="tab">Shopify listings</button>
+    </div>
+  </div>
+
+  <div class="search-row">
+    <span class="icon" aria-hidden="true">🔍</span>
+    <input type="search" id="searchInput" placeholder="Search by word, category or color…" aria-label="Search vocabulary">
+    <button class="clear-btn" id="clearSearch" aria-label="Clear search">✕</button>
+  </div>
+
+  <!-- INVENTORY VIEW -->
+  <div id="inventoryView">
+    <section class="block">
+      <div class="block-head">
+        <h2>Categories</h2>
+        <button class="btn small ghost" id="clearFilterBtn" style="display:none;">Clear filter</button>
+      </div>
+      <div class="cat-grid" id="catGrid"></div>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2 id="wordsHeading">Words</h2>
+        <button class="btn small primary" id="addWordInCatBtn" style="display:none;">＋ Add word here</button>
+      </div>
+      <div class="word-grid" id="wordGrid"></div>
+    </section>
+  </div>
+
+  <!-- LISTINGS VIEW -->
+  <div id="listingsView" style="display:none;">
+    <section class="block">
+      <div class="block-head">
+        <h2>Shopify listings</h2>
+        <button class="btn small primary" id="addListingBtn">＋ Add listing</button>
+      </div>
+      <div class="listing-grid" id="listingGrid"></div>
+    </section>
+  </div>
+
+</div>
+
+<div id="modalRoot"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "pecs-inventory-data-v1";
+  var THEME_KEY = "pecs-inventory-theme";
+  var GH_CONFIG_KEY = "pecs-inventory-github-config";
+
+  // ---------- GitHub sync ----------
+  var ghStatus = { lastSyncedAt: null, lastError: null, syncing: false };
+
+  function loadGhConfig(){
+    try {
+      var raw = localStorage.getItem(GH_CONFIG_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+  function saveGhConfig(cfg){
+    try { localStorage.setItem(GH_CONFIG_KEY, JSON.stringify(cfg)); } catch(e) {}
+  }
+  function clearGhConfig(){
+    try { localStorage.removeItem(GH_CONFIG_KEY); } catch(e) {}
+  }
+  function b64EncodeUnicode(str){
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+  function b64DecodeUnicode(str){
+    return decodeURIComponent(escape(atob(str)));
+  }
+  function ghApiUrl(cfg){
+    return "https://api.github.com/repos/" + encodeURIComponent(cfg.owner) + "/" + encodeURIComponent(cfg.repo) +
+      "/contents/" + cfg.path.split("/").map(encodeURIComponent).join("/");
+  }
+  function ghHeaders(cfg){
+    return {
+      "Authorization": "token " + cfg.token,
+      "Accept": "application/vnd.github+json"
+    };
+  }
+  // Fetches the data file from the repo. Returns {data, sha} or null if the file doesn't exist yet.
+  function githubPull(cfg){
+    var url = ghApiUrl(cfg) + "?ref=" + encodeURIComponent(cfg.branch || "main") + "&t=" + Date.now();
+    return fetch(url, { headers: ghHeaders(cfg) }).then(function(res){
+      if (res.status === 404) return null;
+      if (!res.ok) return res.text().then(function(t){ throw new Error("GitHub error " + res.status + ": " + t.slice(0,200)); });
+      return res.json().then(function(json){
+        var content = b64DecodeUnicode(json.content.replace(/\n/g, ""));
+        return { data: JSON.parse(content), sha: json.sha };
+      });
+    });
+  }
+  // Writes the current data to the repo, creating the file if it doesn't exist. Returns the new sha.
+  function githubPush(cfg, dataObj, knownSha){
+    var body = {
+      message: "PECS inventory backup — " + new Date().toISOString(),
+      content: b64EncodeUnicode(JSON.stringify(dataObj, null, 2)),
+      branch: cfg.branch || "main"
+    };
+    if (knownSha) body.sha = knownSha;
+    return fetch(ghApiUrl(cfg), {
+      method: "PUT",
+      headers: Object.assign({ "Content-Type": "application/json" }, ghHeaders(cfg)),
+      body: JSON.stringify(body)
+    }).then(function(res){
+      if (!res.ok) return res.text().then(function(t){ throw new Error("GitHub error " + res.status + ": " + t.slice(0,200)); });
+      return res.json().then(function(json){ return json.content.sha; });
+    });
+  }
+
+  var PRESET_CATEGORIES = [
+    { name: "Nouns", color: "#F2954A" },
+    { name: "Verbs", color: "#5FA85B" },
+    { name: "Descriptors", color: "#4C86C6" },
+    { name: "Pronouns", color: "#F2D43C" },
+    { name: "Prepositions", color: "#9B7BC4" },
+    { name: "Question words", color: "#E88BB0" },
+    { name: "Social / greetings", color: "#B9B6AA" },
+    { name: "Negation", color: "#D9584A" }
+  ];
+
+  var db = { categories: [], words: [], listings: [] };
+  var state = {
+    view: "inventory",
+    search: "",
+    activeCategoryFilter: null
+  };
+  var downloadsCap = null;
+  (function initDownloads(){
+    try {
+      if (window.claude && typeof window.claude.use === "function") {
+        window.claude.use("downloads").then(function(ns){ downloadsCap = ns; }).catch(function(){ downloadsCap = null; });
+      }
+    } catch(e) { downloadsCap = null; }
+  })();
+
+  function timestampForFilename(){
+    var d = new Date();
+    function pad(n){ return (n<10?"0":"")+n; }
+    return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()) + "-" + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+  }
+
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+  function load(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        db.categories = parsed.categories || [];
+        db.words = parsed.words || [];
+        db.listings = parsed.listings || [];
+      }
+    } catch(e) {
+      console.error("Could not load saved data", e);
+    }
+    try {
+      var theme = localStorage.getItem(THEME_KEY);
+      if (theme) document.documentElement.setAttribute("data-theme", theme);
+    } catch(e) {}
+  }
+
+  function save(){
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    } catch(e) {
+      console.error("Could not save data", e);
+      alert("Your changes couldn't be saved to this browser's storage. They may be lost on reload.");
+    }
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(c){
+      return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c];
+    });
+  }
+
+  function catsById(){
+    var map = {};
+    db.categories.forEach(function(c){ map[c.id] = c; });
+    return map;
+  }
+
+  function wordCountForCat(catId){
+    return db.words.filter(function(w){ return w.categoryIds.indexOf(catId) !== -1; }).length;
+  }
+
+  function matchesSearch(haystackParts, query){
+    if (!query) return true;
+    var q = query.toLowerCase();
+    return haystackParts.some(function(p){ return String(p).toLowerCase().indexOf(q) !== -1; });
+  }
+
+  // ---------- RENDER ----------
+
+  function renderSyncLine(){
+    var el = document.getElementById("syncLine");
+    var cfg = loadGhConfig();
+    if (!cfg) { el.style.display = "none"; return; }
+    el.style.display = "block";
+    if (ghStatus.syncing) {
+      el.textContent = "🔄 Syncing with " + cfg.owner + "/" + cfg.repo + "…";
+    } else if (ghStatus.lastError) {
+      el.textContent = "⚠️ GitHub sync error — open Backup to retry.";
+    } else if (ghStatus.lastSyncedAt) {
+      el.textContent = "🔗 Synced with " + cfg.owner + "/" + cfg.repo + " · " + timeAgo(ghStatus.lastSyncedAt);
+    } else {
+      el.textContent = "🔗 Connected to " + cfg.owner + "/" + cfg.repo + " — not yet synced.";
+    }
+  }
+  function timeAgo(iso){
+    var s = Math.round((Date.now() - new Date(iso).getTime())/1000);
+    if (s < 60) return "just now";
+    var m = Math.round(s/60); if (m < 60) return m + "m ago";
+    var h = Math.round(m/60); if (h < 24) return h + "h ago";
+    var d = Math.round(h/24); return d + "d ago";
+  }
+
+  function renderCountLine(){
+    var catCount = db.categories.length;
+    var wordCount = db.words.length;
+    document.getElementById("countLine").innerHTML =
+      "<strong>" + wordCount + "</strong> word" + (wordCount===1?"":"s") +
+      " across <strong>" + catCount + "</strong> categor" + (catCount===1?"y":"ies") +
+      " · " + db.listings.length + " Shopify listing" + (db.listings.length===1?"":"s");
+  }
+
+  function renderCategories(){
+    var grid = document.getElementById("catGrid");
+    var cmap = catsById();
+    if (db.categories.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><strong>No categories yet</strong>Group your cards by type — nouns, verbs, feelings — so they\'re easy to find later.</div>';
+      document.getElementById("clearFilterBtn").style.display = "none";
+      return;
+    }
+    var q = state.search;
+    var html = "";
+    db.categories.slice().sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(c){
+      var count = wordCountForCat(c.id);
+      var visible = matchesSearch([c.name, c.colorName || "", c.color], q);
+      if (!visible) return;
+      var active = state.activeCategoryFilter === c.id;
+      html += '<button type="button" class="cat-card' + (active ? ' active' : '') + '" style="--cat-color:' + c.color + '" data-cat="' + c.id + '">' +
+        '<span class="cat-actions">' +
+          '<span class="icon-btn add-word-to-cat" data-cat="' + c.id + '" title="Add word to this category">＋</span>' +
+          '<span class="icon-btn edit-cat" data-cat="' + c.id + '" title="Edit category">✎</span>' +
+          '<span class="icon-btn del-cat" data-cat="' + c.id + '" title="Delete category">🗑</span>' +
+        '</span>' +
+        '<span class="name">' + escapeHtml(c.name) + '</span>' +
+        '<span class="meta">' + count + ' word' + (count===1?'':'s') + (c.colorName ? ' · ' + escapeHtml(c.colorName) : '') + '</span>' +
+      '</button>';
+    });
+    grid.innerHTML = html || '<div class="empty-state" style="grid-column:1/-1;">No categories match your search.</div>';
+    document.getElementById("clearFilterBtn").style.display = state.activeCategoryFilter ? "inline-flex" : "none";
+
+    var addHereBtn = document.getElementById("addWordInCatBtn");
+    var heading = document.getElementById("wordsHeading");
+    if (state.activeCategoryFilter && cmap[state.activeCategoryFilter]) {
+      heading.textContent = "Words in " + cmap[state.activeCategoryFilter].name;
+      addHereBtn.style.display = "inline-flex";
+    } else {
+      heading.textContent = "Words";
+      addHereBtn.style.display = "none";
+    }
+  }
+
+  function renderWords(){
+    var grid = document.getElementById("wordGrid");
+    var cmap = catsById();
+    if (db.words.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><strong>No words yet</strong>Add your first PECS card word to start building your inventory.</div>';
+      return;
+    }
+    var q = state.search;
+    var filtered = db.words.filter(function(w){
+      if (state.activeCategoryFilter && w.categoryIds.indexOf(state.activeCategoryFilter) === -1) return false;
+      var catNames = w.categoryIds.map(function(id){ return cmap[id] ? cmap[id].name : ""; });
+      var colorNames = w.categoryIds.map(function(id){ return cmap[id] ? (cmap[id].colorName || cmap[id].color) : ""; });
+      return matchesSearch([w.text].concat(catNames).concat(colorNames), q);
+    }).sort(function(a,b){ return a.text.localeCompare(b.text); });
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">No words match your search or filter.</div>';
+      return;
+    }
+
+    var html = "";
+    filtered.forEach(function(w){
+      var chips = w.categoryIds.map(function(id){
+        var c = cmap[id];
+        if (!c) return "";
+        return '<span class="chip"><span class="dot" style="--dot-color:' + c.color + '"></span>' + escapeHtml(c.name) + '</span>';
+      }).join("");
+      html += '<div class="word-card">' +
+        '<span class="word-actions">' +
+          '<span class="icon-btn edit-word" data-word="' + w.id + '" title="Edit word">✎</span>' +
+          '<span class="icon-btn del-word" data-word="' + w.id + '" title="Delete word">🗑</span>' +
+        '</span>' +
+        '<span class="word-text">' + escapeHtml(w.text) + '</span>' +
+        '<div class="chip-row">' + (chips || '<span class="hint">Uncategorized</span>') + '</div>' +
+      '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function renderListings(){
+    var grid = document.getElementById("listingGrid");
+    var cmap = catsById();
+    if (db.listings.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><strong>No listings yet</strong>Add a Shopify listing and tag it with the words, categories and colors it uses.</div>';
+      return;
+    }
+    var q = state.search;
+    var filtered = db.listings.filter(function(l){
+      var catNames = l.categoryIds.map(function(id){ return cmap[id] ? cmap[id].name : ""; });
+      var colorNames = l.colors.map(function(col){ return col.name || col.hex; });
+      return matchesSearch([l.name].concat(l.words).concat(catNames).concat(colorNames), q);
+    });
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">No listings match your search.</div>';
+      return;
+    }
+    var html = "";
+    filtered.forEach(function(l){
+      var catChips = l.categoryIds.map(function(id){
+        var c = cmap[id];
+        if (!c) return "";
+        return '<span class="chip"><span class="dot" style="--dot-color:' + c.color + '"></span>' + escapeHtml(c.name) + '</span>';
+      }).join("");
+      var swatches = l.colors.map(function(col){
+        return '<span class="color-swatch" style="background:' + col.hex + '" title="' + escapeHtml(col.name || col.hex) + '"></span>';
+      }).join("");
+      html += '<div class="listing-card">' +
+        '<span class="word-actions">' +
+          '<span class="icon-btn edit-listing" data-listing="' + l.id + '" title="Edit listing">✎</span>' +
+          '<span class="icon-btn del-listing" data-listing="' + l.id + '" title="Delete listing">🗑</span>' +
+        '</span>' +
+        '<span class="name">' + escapeHtml(l.name) + '</span>' +
+        '<div class="word-list">' + (l.words.length ? escapeHtml(l.words.join(", ")) : "No words tagged") + '</div>' +
+        '<div class="chip-row">' + catChips + '</div>' +
+        (swatches ? '<div class="color-strip">' + swatches + '</div>' : "") +
+      '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function renderAll(){
+    renderCountLine();
+    renderSyncLine();
+    renderCategories();
+    renderWords();
+    renderListings();
+  }
+
+  // ---------- MODALS ----------
+
+  function closeModal(){
+    document.getElementById("modalRoot").innerHTML = "";
+    document.removeEventListener("keydown", escHandler);
+  }
+  function escHandler(e){ if (e.key === "Escape") closeModal(); }
+
+  function openModal(innerHtml, onMount){
+    document.getElementById("modalRoot").innerHTML =
+      '<div class="overlay" id="overlay"><div class="modal" role="dialog" aria-modal="true">' +
+        '<button class="icon-btn close-x" id="modalClose" aria-label="Close">✕</button>' +
+        innerHtml +
+      '</div></div>';
+    document.getElementById("overlay").addEventListener("click", function(e){
+      if (e.target.id === "overlay") closeModal();
+    });
+    document.getElementById("modalClose").addEventListener("click", closeModal);
+    document.addEventListener("keydown", escHandler);
+    if (onMount) onMount();
+  }
+
+  function categoryPillsHtml(selectedIds){
+    selectedIds = selectedIds || [];
+    if (db.categories.length === 0) {
+      return '<p class="empty-cats-note">No categories yet — add one first so you can tag this word.</p>';
+    }
+    return '<div class="check-grid" id="catPillGrid">' + db.categories.map(function(c){
+      var checked = selectedIds.indexOf(c.id) !== -1;
+      return '<label class="check-pill' + (checked ? ' checked' : '') + '" data-cat="' + c.id + '">' +
+        '<input type="checkbox" value="' + c.id + '"' + (checked ? ' checked' : '') + '>' +
+        '<span class="dot" style="--dot-color:' + c.color + '"></span>' + escapeHtml(c.name) +
+      '</label>';
+    }).join("") + '</div>';
+  }
+
+  function wireCheckPills(container){
+    container.querySelectorAll(".check-pill").forEach(function(pill){
+      var input = pill.querySelector("input");
+      input.addEventListener("change", function(){
+        pill.classList.toggle("checked", input.checked);
+      });
+    });
+  }
+
+  // ---- Add / Edit Word ----
+  function openWordModal(existing, presetCategoryId){
+    var isEdit = !!existing;
+    var initialCats = isEdit ? existing.categoryIds : (presetCategoryId ? [presetCategoryId] : []);
+    var cmapForTitle = catsById();
+    var presetName = (!isEdit && presetCategoryId && cmapForTitle[presetCategoryId]) ? cmapForTitle[presetCategoryId].name : null;
+    var html =
+      '<h3>' + (isEdit ? "Edit word" : (presetName ? "Add word to " + escapeHtml(presetName) : "Add word")) + '</h3>' +
+      '<div class="field"><label for="wordTextInput">Word</label>' +
+      '<input type="text" id="wordTextInput" placeholder="e.g. more, apple, happy" value="' + (isEdit ? escapeHtml(existing.text) : "") + '"></div>' +
+      '<div class="field"><label>Categories</label>' + categoryPillsHtml(initialCats) + '</div>' +
+      '<div class="modal-actions">' +
+        (isEdit ? '<button class="btn danger-text ghost" id="deleteWordBtn">Delete</button>' : '') +
+        '<button class="btn" id="cancelWordBtn">Cancel</button>' +
+        '<button class="btn primary" id="saveWordBtn">Save</button>' +
+      '</div>';
+    openModal(html, function(){
+      var modal = document.querySelector(".modal");
+      wireCheckPills(modal);
+      document.getElementById("wordTextInput").focus();
+      document.getElementById("cancelWordBtn").addEventListener("click", closeModal);
+      if (isEdit) {
+        document.getElementById("deleteWordBtn").addEventListener("click", function(){
+          if (confirm('Delete "' + existing.text + '"? This can\'t be undone.')) {
+            db.words = db.words.filter(function(w){ return w.id !== existing.id; });
+            save(); closeModal(); renderAll();
+          }
+        });
+      }
+      document.getElementById("saveWordBtn").addEventListener("click", function(){
+        var text = document.getElementById("wordTextInput").value.trim();
+        if (!text) { alert("Give the word some text first."); return; }
+        var checked = Array.prototype.slice.call(modal.querySelectorAll('#catPillGrid input:checked')).map(function(i){ return i.value; });
+        if (isEdit) {
+          existing.text = text;
+          existing.categoryIds = checked;
+        } else {
+          db.words.push({ id: uid(), text: text, categoryIds: checked });
+        }
+        save(); closeModal(); renderAll();
+      });
+    });
+  }
+
+  // ---- Add / Edit Category ----
+  function openCategoryModal(existing){
+    var isEdit = !!existing;
+    var presetHtml = !isEdit ? (
+      '<div class="field"><label>Quick add — PECS color presets</label>' +
+      '<div class="preset-swatches">' + PRESET_CATEGORIES.map(function(p){
+        return '<button type="button" class="preset-swatch" data-name="' + escapeHtml(p.name) + '" data-color="' + p.color + '">' +
+          '<span class="dot" style="--dot-color:' + p.color + '"></span>' + escapeHtml(p.name) + '</button>';
+      }).join("") + '</div>' +
+      '<p class="hint">Based on the commonly used Fitzgerald Key color scheme — tap one to add it instantly, or make your own below.</p></div>'
+    ) : "";
+    var html =
+      '<h3>' + (isEdit ? "Edit category" : "Add category") + '</h3>' +
+      presetHtml +
+      '<div class="field"><label for="catNameInput">Category name</label>' +
+      '<input type="text" id="catNameInput" placeholder="e.g. Verbs" value="' + (isEdit ? escapeHtml(existing.name) : "") + '"></div>' +
+      '<div class="field"><label for="catColorInput">Color</label>' +
+      '<div class="color-row">' +
+        '<input type="color" id="catColorInput" value="' + (isEdit ? existing.color : "#2F6F6B") + '">' +
+        '<input type="text" id="catColorNameInput" placeholder="Color name (optional), e.g. Green" style="flex:1; padding:10px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--ink); font-family:inherit; font-size:15px;" value="' + (isEdit && existing.colorName ? escapeHtml(existing.colorName) : "") + '">' +
+      '</div></div>' +
+      '<div class="modal-actions">' +
+        (isEdit ? '<button class="btn danger-text ghost" id="deleteCatBtn">Delete</button>' : '') +
+        '<button class="btn" id="cancelCatBtn">Cancel</button>' +
+        '<button class="btn primary" id="saveCatBtn">Save</button>' +
+      '</div>';
+    openModal(html, function(){
+      document.getElementById("catNameInput").focus();
+      document.getElementById("cancelCatBtn").addEventListener("click", closeModal);
+      if (!isEdit) {
+        document.querySelectorAll(".preset-swatch").forEach(function(btn){
+          btn.addEventListener("click", function(){
+            document.getElementById("catNameInput").value = btn.getAttribute("data-name");
+            document.getElementById("catColorInput").value = btn.getAttribute("data-color");
+            document.getElementById("catColorNameInput").value = "";
+          });
+        });
+      }
+      if (isEdit) {
+        document.getElementById("deleteCatBtn").addEventListener("click", function(){
+          var count = wordCountForCat(existing.id);
+          var msg = count > 0
+            ? 'Delete "' + existing.name + '"? It will be removed from ' + count + ' word' + (count===1?'':'s') + ' and any listings using it.'
+            : 'Delete "' + existing.name + '"?';
+          if (confirm(msg)) {
+            db.categories = db.categories.filter(function(c){ return c.id !== existing.id; });
+            db.words.forEach(function(w){ w.categoryIds = w.categoryIds.filter(function(id){ return id !== existing.id; }); });
+            db.listings.forEach(function(l){ l.categoryIds = l.categoryIds.filter(function(id){ return id !== existing.id; }); });
+            if (state.activeCategoryFilter === existing.id) state.activeCategoryFilter = null;
+            save(); closeModal(); renderAll();
+          }
+        });
+      }
+      document.getElementById("saveCatBtn").addEventListener("click", function(){
+        var name = document.getElementById("catNameInput").value.trim();
+        if (!name) { alert("Give the category a name first."); return; }
+        var color = document.getElementById("catColorInput").value;
+        var colorName = document.getElementById("catColorNameInput").value.trim();
+        if (isEdit) {
+          existing.name = name; existing.color = color; existing.colorName = colorName;
+        } else {
+          db.categories.push({ id: uid(), name: name, color: color, colorName: colorName });
+        }
+        save(); closeModal(); renderAll();
+      });
+    });
+  }
+
+  // ---- Add / Edit Listing ----
+  function openListingModal(existing){
+    var isEdit = !!existing;
+    var words = isEdit ? existing.words.slice() : [];
+    var colors = isEdit ? existing.colors.slice() : [];
+
+    var html =
+      '<h3>' + (isEdit ? "Edit listing" : "Add Shopify listing") + '</h3>' +
+      '<div class="field"><label for="listingNameInput">Listing name</label>' +
+      '<input type="text" id="listingNameInput" placeholder="e.g. Feelings Flashcard Set" value="' + (isEdit ? escapeHtml(existing.name) : "") + '"></div>' +
+      '<div class="field"><label>Words in this listing</label>' +
+      '<div class="tag-entry"><input type="text" id="listingWordInput" placeholder="Type a word and press Enter"><button class="btn small" id="addTagBtn" type="button">Add</button></div>' +
+      '<div class="tag-list" id="listingWordTags"></div></div>' +
+      '<div class="field"><label>Categories</label>' + categoryPillsHtml(isEdit ? existing.categoryIds : []) + '</div>' +
+      '<div class="field"><label>Colors</label>' +
+      '<div class="color-row"><input type="color" id="listingColorInput" value="#2F6F6B">' +
+      '<input type="text" id="listingColorNameInput" placeholder="Color name (optional)" style="flex:1; padding:10px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--ink); font-family:inherit; font-size:15px;">' +
+      '<button class="btn small" id="addColorBtn" type="button">Add</button></div>' +
+      '<div class="tag-list" id="listingColorTags"></div></div>' +
+      '<div class="modal-actions">' +
+        (isEdit ? '<button class="btn danger-text ghost" id="deleteListingBtn">Delete</button>' : '') +
+        '<button class="btn" id="cancelListingBtn">Cancel</button>' +
+        '<button class="btn primary" id="saveListingBtn">Save</button>' +
+      '</div>';
+
+    openModal(html, function(){
+      var modal = document.querySelector(".modal");
+      wireCheckPills(modal);
+      document.getElementById("listingNameInput").focus();
+      document.getElementById("cancelListingBtn").addEventListener("click", closeModal);
+
+      function renderWordTags(){
+        document.getElementById("listingWordTags").innerHTML = words.map(function(w, i){
+          return '<span class="tag">' + escapeHtml(w) + '<button type="button" data-i="' + i + '" class="rm-word-tag">✕</button></span>';
+        }).join("");
+        modal.querySelectorAll(".rm-word-tag").forEach(function(btn){
+          btn.addEventListener("click", function(){ words.splice(parseInt(btn.getAttribute("data-i"),10),1); renderWordTags(); });
+        });
+      }
+      function addWordTag(){
+        var input = document.getElementById("listingWordInput");
+        var v = input.value.trim();
+        if (v) { words.push(v); input.value = ""; renderWordTags(); }
+        input.focus();
+      }
+      document.getElementById("addTagBtn").addEventListener("click", addWordTag);
+      document.getElementById("listingWordInput").addEventListener("keydown", function(e){
+        if (e.key === "Enter") { e.preventDefault(); addWordTag(); }
+      });
+      renderWordTags();
+
+      function renderColorTags(){
+        document.getElementById("listingColorTags").innerHTML = colors.map(function(c, i){
+          return '<span class="tag"><span class="dot" style="--dot-color:' + c.hex + '"></span>' + escapeHtml(c.name || c.hex) + '<button type="button" data-i="' + i + '" class="rm-color-tag">✕</button></span>';
+        }).join("");
+        modal.querySelectorAll(".rm-color-tag").forEach(function(btn){
+          btn.addEventListener("click", function(){ colors.splice(parseInt(btn.getAttribute("data-i"),10),1); renderColorTags(); });
+        });
+      }
+      document.getElementById("addColorBtn").addEventListener("click", function(){
+        var hex = document.getElementById("listingColorInput").value;
+        var name = document.getElementById("listingColorNameInput").value.trim();
+        colors.push({ hex: hex, name: name });
+        document.getElementById("listingColorNameInput").value = "";
+        renderColorTags();
+      });
+      renderColorTags();
+
+      if (isEdit) {
+        document.getElementById("deleteListingBtn").addEventListener("click", function(){
+          if (confirm('Delete listing "' + existing.name + '"?')) {
+            db.listings = db.listings.filter(function(l){ return l.id !== existing.id; });
+            save(); closeModal(); renderAll();
+          }
+        });
+      }
+
+      document.getElementById("saveListingBtn").addEventListener("click", function(){
+        var name = document.getElementById("listingNameInput").value.trim();
+        if (!name) { alert("Give the listing a name first."); return; }
+        var checkedCats = Array.prototype.slice.call(modal.querySelectorAll('#catPillGrid input:checked')).map(function(i){ return i.value; });
+        if (isEdit) {
+          existing.name = name; existing.words = words; existing.categoryIds = checkedCats; existing.colors = colors;
+        } else {
+          db.listings.push({ id: uid(), name: name, words: words, categoryIds: checkedCats, colors: colors });
+        }
+        save(); closeModal(); renderAll();
+      });
+    });
+  }
+
+  // ---- GitHub sync section (used inside the Backup modal) ----
+  function githubSectionHtml(){
+    var cfg = loadGhConfig();
+    if (!cfg) {
+      return (
+        '<div class="field" style="border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; background:var(--surface-2);">' +
+          '<label style="margin-bottom:8px;">GitHub sync <span class="hint" style="font-weight:400;">— keep this inventory in a file in your own repo, synced across devices</span></label>' +
+          '<div class="field" style="margin-bottom:8px;"><input type="text" id="ghOwner" placeholder="GitHub username or org"></div>' +
+          '<div class="field" style="margin-bottom:8px;"><input type="text" id="ghRepo" placeholder="Repository name (e.g. pecs-inventory)"></div>' +
+          '<div class="field" style="margin-bottom:8px;"><input type="text" id="ghBranch" placeholder="Branch (default: main)"></div>' +
+          '<div class="field" style="margin-bottom:8px;"><input type="text" id="ghPath" placeholder="Data file path (default: data.json)"></div>' +
+          '<div class="field" style="margin-bottom:4px;"><input type="text" id="ghToken" placeholder="Personal access token (repo contents: read & write)"></div>' +
+          '<p class="hint">Create a fine-grained token at github.com/settings/tokens scoped to just this repo, with Contents: Read and write. It\'s stored only in this browser — never uploaded anywhere.</p>' +
+          '<button class="btn small primary" id="ghConnectBtn" type="button" style="margin-top:8px;">Connect</button>' +
+        '</div>'
+      );
+    }
+    return (
+      '<div class="field" style="border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; background:var(--surface-2);">' +
+        '<label style="margin-bottom:6px;">GitHub sync</label>' +
+        '<p class="hint" style="margin-bottom:10px;">Connected to <strong style="color:var(--ink);">' + escapeHtml(cfg.owner) + '/' + escapeHtml(cfg.repo) + '</strong> (' + escapeHtml(cfg.path) + ' on ' + escapeHtml(cfg.branch) + ').' +
+          (ghStatus.lastSyncedAt ? ' Last synced ' + timeAgo(ghStatus.lastSyncedAt) + '.' : ' Not yet synced.') + '</p>' +
+        (ghStatus.lastError ? '<p class="hint" style="color:var(--danger); margin-bottom:10px;">' + escapeHtml(ghStatus.lastError) + '</p>' : '') +
+        '<div style="display:flex; gap:8px; flex-wrap:wrap;">' +
+          '<button class="btn small primary" id="ghPushBtn" type="button">⬆ Push current data</button>' +
+          '<button class="btn small" id="ghPullBtn" type="button">⬇ Pull latest</button>' +
+          '<button class="btn small danger-text ghost" id="ghDisconnectBtn" type="button">Disconnect</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function wireGithubSection(){
+    var connectBtn = document.getElementById("ghConnectBtn");
+    if (connectBtn) {
+      connectBtn.addEventListener("click", function(){
+        var owner = document.getElementById("ghOwner").value.trim();
+        var repo = document.getElementById("ghRepo").value.trim();
+        var branch = document.getElementById("ghBranch").value.trim() || "main";
+        var path = document.getElementById("ghPath").value.trim() || "data.json";
+        var token = document.getElementById("ghToken").value.trim();
+        if (!owner || !repo || !token) { alert("Fill in the GitHub username, repository, and token first."); return; }
+        var cfg = { owner: owner, repo: repo, branch: branch, path: path, token: token };
+        saveGhConfig(cfg);
+        ghStatus = { lastSyncedAt: null, lastError: null, syncing: false };
+        closeModal();
+        openBackupModal();
+      });
+    }
+    var pushBtn = document.getElementById("ghPushBtn");
+    if (pushBtn) {
+      pushBtn.addEventListener("click", function(){
+        var cfg = loadGhConfig();
+        pushBtn.textContent = "Pushing…";
+        ghStatus.syncing = true; renderSyncLine();
+        githubPull(cfg).then(function(existing){
+          return githubPush(cfg, db, existing ? existing.sha : null);
+        }).then(function(){
+          ghStatus.syncing = false; ghStatus.lastError = null; ghStatus.lastSyncedAt = new Date().toISOString();
+          renderSyncLine();
+          closeModal(); openBackupModal();
+        }).catch(function(err){
+          ghStatus.syncing = false; ghStatus.lastError = err.message || "Push failed.";
+          renderSyncLine();
+          closeModal(); openBackupModal();
+        });
+      });
+    }
+    var pullBtn = document.getElementById("ghPullBtn");
+    if (pullBtn) {
+      pullBtn.addEventListener("click", function(){
+        var cfg = loadGhConfig();
+        pullBtn.textContent = "Pulling…";
+        ghStatus.syncing = true; renderSyncLine();
+        githubPull(cfg).then(function(result){
+          ghStatus.syncing = false;
+          if (!result) { ghStatus.lastError = "No data file found yet in that repo — push first."; renderSyncLine(); closeModal(); openBackupModal(); return; }
+          if (!confirm("Replace the inventory currently shown with the version saved on GitHub?")) { renderSyncLine(); return; }
+          db.categories = result.data.categories || [];
+          db.words = result.data.words || [];
+          db.listings = result.data.listings || [];
+          save();
+          ghStatus.lastError = null; ghStatus.lastSyncedAt = new Date().toISOString();
+          renderAll();
+          closeModal(); openBackupModal();
+        }).catch(function(err){
+          ghStatus.syncing = false; ghStatus.lastError = err.message || "Pull failed.";
+          renderSyncLine();
+          closeModal(); openBackupModal();
+        });
+      });
+    }
+    var disconnectBtn = document.getElementById("ghDisconnectBtn");
+    if (disconnectBtn) {
+      disconnectBtn.addEventListener("click", function(){
+        if (confirm("Disconnect GitHub sync? Your data stays as-is; the token will be forgotten by this browser.")) {
+          clearGhConfig();
+          ghStatus = { lastSyncedAt: null, lastError: null, syncing: false };
+          renderSyncLine();
+          closeModal(); openBackupModal();
+        }
+      });
+    }
+  }
+
+  // ---- Backup ----
+  function openBackupModal(){
+    var json = JSON.stringify(db, null, 2);
+    var html =
+      '<h3>Backup &amp; sync</h3>' +
+      githubSectionHtml() +
+      '<p class="hint" style="margin:16px 0 10px;">No GitHub repo? You can still back up manually:</p>' +
+      '<div class="field"><label>Current data (copy this)</label>' +
+      '<textarea id="backupOut" readonly style="width:100%;height:110px;font-family:ui-monospace,monospace;font-size:12px;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);">' + escapeHtml(json) + '</textarea></div>' +
+      '<div class="field"><label>Restore from backup (paste here)</label>' +
+      '<textarea id="backupIn" placeholder="Paste backup JSON here…" style="width:100%;height:90px;font-family:ui-monospace,monospace;font-size:12px;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--ink);"></textarea></div>' +
+      '<div class="modal-actions">' +
+        '<button class="btn" id="downloadBackupBtn">⬇ Download file</button>' +
+        '<button class="btn" id="copyBackupBtn">Copy to clipboard</button>' +
+        '<button class="btn primary" id="restoreBackupBtn">Restore</button>' +
+      '</div>';
+    openModal(html, function(){
+      wireGithubSection();
+      document.getElementById("downloadBackupBtn").addEventListener("click", function(){
+        var btn = document.getElementById("downloadBackupBtn");
+        if (!downloadsCap) {
+          alert("File downloads aren't available in this view — use \"Copy to clipboard\" instead and paste it into a note.");
+          return;
+        }
+        var filename = "pecs-inventory-backup-" + timestampForFilename() + ".json";
+        btn.textContent = "Saving…";
+        downloadsCap.save({ filename: filename, data: json })
+          .then(function(){ btn.textContent = "Saved ✓"; })
+          .catch(function(err){
+            btn.textContent = "⬇ Download file";
+            if (err && err.code === "declined") return;
+            alert("Couldn't save the file (" + (err && err.code || "unknown error") + "). Try Copy to clipboard instead.");
+          });
+      });
+      document.getElementById("copyBackupBtn").addEventListener("click", function(){
+        var ta = document.getElementById("backupOut");
+        ta.select();
+        try {
+          navigator.clipboard.writeText(ta.value).then(function(){
+            document.getElementById("copyBackupBtn").textContent = "Copied ✓";
+          }).catch(function(){ document.execCommand("copy"); });
+        } catch(e) {
+          try { document.execCommand("copy"); } catch(e2) {}
+        }
+      });
+      document.getElementById("restoreBackupBtn").addEventListener("click", function(){
+        var raw = document.getElementById("backupIn").value.trim();
+        if (!raw) { alert("Paste backup JSON first."); return; }
+        try {
+          var parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed !== "object") throw new Error("bad shape");
+          db.categories = parsed.categories || [];
+          db.words = parsed.words || [];
+          db.listings = parsed.listings || [];
+          save();
+          closeModal();
+          renderAll();
+          alert("Backup restored.");
+        } catch(e) {
+          alert("That doesn't look like a valid backup file.");
+        }
+      });
+    });
+  }
+
+  // ---------- EVENTS ----------
+
+  document.getElementById("addWordBtn").addEventListener("click", function(){ openWordModal(null, state.activeCategoryFilter); });
+  document.getElementById("addCategoryBtn").addEventListener("click", function(){ openCategoryModal(null); });
+  document.getElementById("addListingBtn").addEventListener("click", function(){ openListingModal(null); });
+  document.getElementById("backupBtn").addEventListener("click", openBackupModal);
+
+  document.getElementById("tabInventory").addEventListener("click", function(){
+    state.view = "inventory";
+    document.getElementById("tabInventory").classList.add("active");
+    document.getElementById("tabListings").classList.remove("active");
+    document.getElementById("inventoryView").style.display = "";
+    document.getElementById("listingsView").style.display = "none";
+  });
+  document.getElementById("tabListings").addEventListener("click", function(){
+    state.view = "listings";
+    document.getElementById("tabListings").classList.add("active");
+    document.getElementById("tabInventory").classList.remove("active");
+    document.getElementById("inventoryView").style.display = "none";
+    document.getElementById("listingsView").style.display = "";
+  });
+
+  var searchInput = document.getElementById("searchInput");
+  var clearSearchBtn = document.getElementById("clearSearch");
+  searchInput.addEventListener("input", function(){
+    state.search = searchInput.value;
+    clearSearchBtn.style.display = state.search ? "flex" : "none";
+    renderCategories(); renderWords(); renderListings();
+  });
+  clearSearchBtn.addEventListener("click", function(){
+    searchInput.value = ""; state.search = ""; clearSearchBtn.style.display = "none";
+    renderCategories(); renderWords(); renderListings();
+    searchInput.focus();
+  });
+
+  document.getElementById("addWordInCatBtn").addEventListener("click", function(){
+    openWordModal(null, state.activeCategoryFilter);
+  });
+
+  document.getElementById("clearFilterBtn").addEventListener("click", function(){
+    state.activeCategoryFilter = null;
+    renderCategories(); renderWords();
+  });
+
+  document.getElementById("catGrid").addEventListener("click", function(e){
+    var addBtn = e.target.closest(".add-word-to-cat");
+    var editBtn = e.target.closest(".edit-cat");
+    var delBtn = e.target.closest(".del-cat");
+    var card = e.target.closest(".cat-card");
+    if (addBtn) {
+      openWordModal(null, addBtn.getAttribute("data-cat"));
+      return;
+    }
+    if (editBtn) {
+      var cat = db.categories.find(function(c){ return c.id === editBtn.getAttribute("data-cat"); });
+      openCategoryModal(cat);
+      return;
+    }
+    if (delBtn) {
+      var cat2 = db.categories.find(function(c){ return c.id === delBtn.getAttribute("data-cat"); });
+      openCategoryModal(cat2); // opens with delete option available
+      return;
+    }
+    if (card) {
+      var id = card.getAttribute("data-cat");
+      state.activeCategoryFilter = (state.activeCategoryFilter === id) ? null : id;
+      renderCategories(); renderWords();
+    }
+  });
+
+  document.getElementById("wordGrid").addEventListener("click", function(e){
+    var editBtn = e.target.closest(".edit-word");
+    var delBtn = e.target.closest(".del-word");
+    if (editBtn) {
+      var w = db.words.find(function(x){ return x.id === editBtn.getAttribute("data-word"); });
+      openWordModal(w);
+    } else if (delBtn) {
+      var w2 = db.words.find(function(x){ return x.id === delBtn.getAttribute("data-word"); });
+      openWordModal(w2);
+    }
+  });
+
+  document.getElementById("listingGrid").addEventListener("click", function(e){
+    var editBtn = e.target.closest(".edit-listing");
+    var delBtn = e.target.closest(".del-listing");
+    if (editBtn) {
+      var l = db.listings.find(function(x){ return x.id === editBtn.getAttribute("data-listing"); });
+      openListingModal(l);
+    } else if (delBtn) {
+      var l2 = db.listings.find(function(x){ return x.id === delBtn.getAttribute("data-listing"); });
+      openListingModal(l2);
+    }
+  });
+
+  document.getElementById("themeToggle").addEventListener("click", function(){
+    var current = document.documentElement.getAttribute("data-theme");
+    var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var effectiveIsDark = current ? current === "dark" : prefersDark;
+    var next = effectiveIsDark ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem(THEME_KEY, next); } catch(e) {}
+  });
+
+  // ---------- INIT ----------
+  load();
+  if (db.categories.length === 0 && db.words.length === 0 && db.listings.length === 0) {
+    // fresh install — leave empty, presets are offered inside the Add Category modal
+  }
+  renderAll();
+
+  (function autoPullOnLoad(){
+    var cfg = loadGhConfig();
+    if (!cfg) return;
+    ghStatus.syncing = true; renderSyncLine();
+    githubPull(cfg).then(function(result){
+      ghStatus.syncing = false;
+      if (result) {
+        db.categories = result.data.categories || [];
+        db.words = result.data.words || [];
+        db.listings = result.data.listings || [];
+        save();
+        ghStatus.lastError = null;
+        ghStatus.lastSyncedAt = new Date().toISOString();
+        renderAll();
+      } else {
+        renderSyncLine();
+      }
+    }).catch(function(err){
+      ghStatus.syncing = false;
+      ghStatus.lastError = err.message || "Couldn't reach GitHub.";
+      renderSyncLine();
+    });
+  })();
+
+})();
+</script>
+</body>
+</html>
